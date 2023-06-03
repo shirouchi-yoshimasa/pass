@@ -12,8 +12,15 @@ def verify_credentials(username, password):
 def change_password(username, new_password):
     users[username] = new_password
 
+def create_account(username, password):
+    if username in users:
+        return False
+    else:
+        users[username] = password
+        return True
+
 def main():
-    menu = ["Home", "Login", "Change Password"]
+    menu = ["Home", "Login", "Change Password", "Create Account"]
     choice = st.sidebar.selectbox("Menu", menu)
 
     if choice == "Home":
@@ -39,7 +46,15 @@ def main():
                 st.success("Password Changed Successfully")
             else:
                 st.warning("Incorrect Username/Old Password")
+    elif choice == "Create Account":
+        st.subheader("Create New Account")
+        new_username = st.text_input("New User Name")
+        new_password = st.text_input("New Password", type='password')
+        if st.button("Create Account"):
+            if create_account(new_username, new_password):
+                st.success("Account Created Successfully")
+            else:
+                st.warning("Username already exists. Please try another.")
 
 if __name__ == "__main__":
     main()
-
