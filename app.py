@@ -1,22 +1,49 @@
 import streamlit as st
+import pandas as pd
+import os
 
-# ユーザ情報を保持する辞書
-users = {"test": "test123"}
+# CSVファイルのパス
+CSV_FILE = "users.csv"
+
+# 初期ユーザデータ（CSVが存在しない場合に使用）
+init_data = {"test": "test123"}
+
+# ユーザ情報をCSVから読み込む
+def load_users():
+    if os.path.exists(CSV_FILE):
+        df = pd.read_csv(CSV_FILE, index_col=0)
+        users = df.to_dict()['password']
+    else:
+        users = init_data
+        df = pd.DataFrame.from_dict(users, orient='index', columns=['password'])
+        df.to_csv(CSV_FILE)
+    return users
+
+# ユーザ情報をCSVに保存する
+def save_users(users):
+    df = pd.DataFrame.from_dict(users, orient='index', columns=['password'])
+    df.to_csv(CSV_FILE)
 
 def verify_credentials(username, password):
+    users = load_users()
     if username in users and users[username] == password:
         return True
     else:
         return False
 
 def change_password(username, new_password):
-    users[username] = new_password
+    users = load_users()
+    if username in users:
+        users[username] = new_password
+        save_users(users)
 
 def create_account(username, password):
+    users = load_users()
     if username in users:
         return False
     else:
         users[username] = password
+        save_users(users)
         return True
 
 def main():
